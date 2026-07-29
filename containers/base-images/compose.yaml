@@ -1,0 +1,12 @@
+services:
+  python-base:
+    build: ./pythonbase
+    container_name: python-base
+    image: python-base
+    depends_on:
+      - linux-base
+
+  linux-base:
+    build: ./linuxbase
+    container_name: linux-base
+    image: linux-base
