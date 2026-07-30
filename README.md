@@ -190,3 +190,78 @@ Clone the application repository to the core-app's src folder
 `cd /cluster-src/containers/core-app/ttp-docker/src`
 
 `sudo git clone https://github.com/mikecolbert/ttp_app.git`
+
+## Edit core-app files
+
+Edit .dockerignore, Dockerfile, .env, and compose.yaml as needed.
+
+## Test your application
+
+### Build your core-app container
+
+This container relies on linux-base -> python-base -> core-app
+
+`cd /cluster-src/containers/core-app/`
+
+`docker compose build`
+
+### Start your core-app container
+
+The -d flag runs the app in the background.  
+`docker compose up -d`
+
+Managing the docker container:
+
+```
+# Control the compose apps via:
+docker compose down # shut down and clean up.
+docker compose restart # restart (but not rebuild) all the containers.
+docker compose logs -f -n 100 # Tail the combined logs (text output) of all containers.
+```
+
+### Connect to your application
+
+http is an alias in your .zshrc file that pulls the docker image for HTTPie and runs it.  
+`http -h localhost:15000`
+
+You should see a _200 OK_ message returned from your app (-h is just pulling the reply header).
+
+### Set your application container to launch on Linux startup
+
+Run the script from the core-app folder that has the compose.yaml that builds your application.  
+Change to the core-apps folder.  
+`cd /cluster-src/containers/core-app/`
+
+Run the script from that folder.  
+`sudo bash /cluster-src/scripts/create-docker-compose-service.sh`
+
+Verify by rebooting your server and testing that the application started.  
+Reboot the server to verify the service is auto-starting.  
+`sudo reboot`
+
+Wait for the server to restart, then login.
+
+Use httpie to call the app, should get 200 OK.  
+`http -h localhost:15000`
+
+You can also docker commands to test that the container is running.  
+`docker ps`
+
+## Configuring NGINX
+
+We're not building a new docker image for NGINX. We are just using it out of the box from Docker Hub and adding our own configuration files.
+
+Create folders for logs, etc.
+
+```
+# Make the static folders for data exchange between the
+# containers, git updates, and data exports
+sudo mkdir -p /cluster-data/
+sudo mkdir -p /cluster-data/nginx/static
+sudo mkdir -p /cluster-data/nginx/logs
+sudo mkdir -p /cluster-data/logs/video-collector
+
+sudo mkdir -p /cluster-data/nginx/letsencrypt-etc
+sudo mkdir -p /cluster-data/nginx/letsencrypt-www
+sudo mkdir -p /cluster-data/nginx/certbot/www
+```

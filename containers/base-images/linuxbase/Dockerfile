@@ -1,8 +1,8 @@
 FROM ubuntu:latest
 
-ENV LANG=en_US.UTF-5
+ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US:en
-ENV LC_ALL=en_US.UTF-5
+ENV LC_ALL=en_US.UTF-8
 ENV TZ="America/Chicago"
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -14,7 +14,7 @@ RUN echo "Heads up - this section takes a little while but only builds once on t
 RUN apt -y install curl
 RUN apt -y install wget
 RUN apt -y install locales
-RUN locale-gen en_US.UTF-5
+RUN locale-gen en_US.UTF-8
 
 RUN apt -y install git
 RUN apt -y install gcc
