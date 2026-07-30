@@ -164,13 +164,12 @@ Enable docker to start at boot:
 Verfiy:  
 `sudo systemctl status docker`
 
----
-
 ### Create the persistent docker elements (network, disks, etc)
 
 `docker network create -d bridge cluster-network --subnet=174.44.0.0/16`
 
-TODO:
+# TODO:
+
 Example: "docker volume create NAME" if you need a persistent volume,
 our example doesn't use one.  
 **_I may need to figure this out to hold the database._**.
@@ -307,9 +306,168 @@ After this, you can use the `deploy` alias created in .zshrc to do the work.
 
 ---
 
+## Configure Let's Encrypt for HTTPS
+
+### Confirm DNS points to your server
+
+`dig +short thetemperatureproject.org`  
+Does the IP returned match the IP address of your server?
+
+### Request the certificate
+
+Move into the folder with the nginx + certbot compose.yaml.  
+`cd /cluster-src/containers/web-servers/`
+
+Ask certbot for a certificate, proving ownership via the shared webroot folder.  
+`docker compose run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ -d thetemperatureproject.org`
+
+Update NGINX configuration to use the certificate.  
+`cd /cluster-src/containers/web-servers/nginx-base-configs/the-temperature-project.nginx`
+
+```
+server {
+    server_name thetemperatureproject.org;
+    charset utf-8;
+    client_max_body_size 1M;
+    server_tokens off;
+
+    # Listen on the HTTPS port and point at the cert files certbot just created
+    listen 443 ssl;
+    http2 on;
+    ssl_certificate /etc/letsencrypt/live/thetemperatureproject.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/thetemperatureproject.org/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    location /static {
+        gzip on;
+        gzip_comp_level 6;
+        gzip_min_length 1100;
+        gzip_buffers 16 8k;
+        gzip_proxied any;
+        gzip_types
+            text/plain
+            text/xml
+            text/css
+            application/javascript
+            application/json
+            application/xml
+            application/rss+xml;
+
+        alias /static/the-temperature-project;
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+        expires 0;
+    }
+
+    # Lets certbot re-validate this domain later, when it's time to renew
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        try_files $uri @yourapplication;
+    }
+    location @yourapplication {
+        gzip on;
+        gzip_disable "msie6";
+        gzip_comp_level 6;
+        gzip_min_length 1100;
+        gzip_buffers    8 256k;
+        gzip_proxied any;
+        gzip_types
+            text/plain
+            text/xml
+            text/css
+            application/javascript
+            application/json
+            application/xml
+            application/rss+xml;
+
+        # Hands the request off to the Granian app server
+        proxy_pass http://174.44.0.100:15000;
+        include uwsgi_params;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Protocol $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host $host;
+    }
+}
+
+# Anything that still arrives on plain HTTP gets bounced to HTTPS
+server {
+    if ($host = thetemperatureproject.org) {
+        return 301 https://$host$request_uri;
+    }
+
+    listen 80;
+    server_name thetemperatureproject.org;
+    return 404;
+}
+```
+
+### Reload NGINX
+
+`cd /cluster-src/containers/web-servers/`  
+`docker compose exec -t nginx nginx -s reload`
+
+Confirm it worked  
+`curl -I https://thetemperatureproject.org`
+
+I had errors and had to add do the following:
+
+1. Create options-ssl-nginx.conf on the host, at the path that's mounted into both containers as /etc/letsencrypt/
+
+```
+sudo tee /cluster-data/nginx/letsencrypt-etc/options-ssl-nginx.conf > /dev/null << 'EOF'
+# This file contains important security parameters. If you modify this file
+# manually, Certbot will be unable to automatically provide future security
+# updates. Instead, Certbot will print and log an error message with a path
+# to the up-to-date file that you will need to refer to when manually
+# updating this file.
+
+ssl_session_cache shared:le_nginx_SSL:10m;
+ssl_session_timeout 1440m;
+ssl_session_tickets off;
+
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers off;
+
+ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384";
+EOF
+```
+
+2. Generate ssl-dhparams.pem (Diffie-Hellman parameters — used to strengthen the key exchange).  
+   `sudo openssl dhparam -out /cluster-data/nginx/letsencrypt-etc/ssl-dhparams.pem 2048`
+
+Then reload and test again.  
+`cd /cluster-src/containers/web-servers/`  
+`docker compose exec -t nginx nginx -s reload`
+
+Confirm it worked  
+`curl -I https://thetemperatureproject.org`
+
+It worked.
+
+### Automate renewal
+
+Let's Encrypt certificates expire every 90 days, so renewal has to run unattended.
+
+Create _/cluster-src/scripts/renew-certs.sh_
+
+Make it executable and schedule it.  
+`sudo mkdir -p /cluster-data/logs/certbot`
+`sudo chmod +x /cluster-src/scripts/renew-certs.sh`
+`crontab -e`
+
+Add this line to crontab:  
+`0 3 * * * /cluster-src/scripts/renew-certs.sh >> /cluster-data/logs/certbot/renew.log 2>&1`
+
+---
+
 # TODO:
 
-lets encrypt
 analytics
 monitoring
 other utils
