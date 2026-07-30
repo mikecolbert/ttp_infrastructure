@@ -251,6 +251,8 @@ You can also docker commands to test that the container is running.
 
 We're not building a new docker image for NGINX. We are just using it out of the box from Docker Hub and adding our own configuration files.
 
+Edit web-server/\* files as needed.
+
 Create folders for logs, etc.
 
 ```
@@ -265,3 +267,35 @@ sudo mkdir -p /cluster-data/nginx/letsencrypt-etc
 sudo mkdir -p /cluster-data/nginx/letsencrypt-www
 sudo mkdir -p /cluster-data/nginx/certbot/www
 ```
+
+### Launch NGINX with Docker Compose.
+
+`cd cluster-src/containers/web-servers/`
+`docker compose up -d`
+
+Test that the empty NGINX container is handling requests.  
+`http -h localhost`
+
+### Set your NGINX container to launch on Linux startup
+
+`cd /cluster-src/containers/web-servers/`
+`sudo bash /cluster-src/scripts/create-docker-compose-service.sh`
+
+### Copy static files to NGINX
+
+We will set the update script to do this automatically, but the first time we'll do it manually.
+
+Make the destination directory.  
+`sudo mkdir -p /cluster-data/nginx/static/the-temperature-project`
+
+Copy the files.  
+`sudo cp -r /cluster-src/containers/core-app/ttp-docker/src/ttp_app/static/* /cluster-data/nginx/static/the-temperature-project`
+
+Verify the static folder contains file structure.  
+`tree /cluster-data/nginx/static/the-temperature-project -d`
+
+Reload NGINX's configuration files.  
+`cd /cluster-src/containers/web-servers/`
+`docker compose exec -t nginx nginx -s reload`
+
+Michael Kennedy. amazon-talk-python-in-production (p. 167). (Function). Kindle Edition.

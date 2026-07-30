@@ -22,7 +22,10 @@ server {
             application/rss+xml;
 
         alias /static/the-temperature-project;
-        expires 365d;
+        # expires 365d;
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+        expires 0;
     }
 
     location /.well-known/acme-challenge/ {
