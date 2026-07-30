@@ -14,13 +14,15 @@ REPO_PATH=$(realpath "$RELATIVE_PATH")
 # ############### END Set up environment ##################################
 
 echo "Building base images"
-cd ${REPO_PATH}/containers/base-images
+# cd ${REPO_PATH}/containers/base-images
+cd /cluster-src/containers/base-images
 docker compose build linux-example-base
 docker compose build python-example-base
 echo "base images done"
 
 echo "Build core app"
-cd ${REPO_PATH}/containers/core-app
+# cd ${REPO_PATH}/containers/core-app
+cd /cluster-src/containers/core-app
 docker compose build
 echo "core app done"
 
@@ -31,8 +33,10 @@ echo "nginx server done"
 
 
 echo "Restart containers (if needed)"
-cd ${REPO_PATH}/containers/core-app
+# cd ${REPO_PATH}/containers/core-app
+cd /cluster-src/containers/core-app
 docker compose up -d --remove-orphans
-cd ${REPO_PATH}/containers/web-servers
+# cd ${REPO_PATH}/containers/web-servers
+cd /cluster-src/containers/web-servers
 docker compose up -d nginx --remove-orphans
 echo "restarts done."
