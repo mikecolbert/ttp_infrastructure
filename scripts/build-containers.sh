@@ -27,7 +27,8 @@ docker compose build
 echo "core app done"
 
 echo "Building nginx server"
-cd ${REPO_PATH}/containers/web-servers
+# cd ${REPO_PATH}/containers/web-servers
+cd /cluster-src/containers/web-servers
 docker compose build
 echo "nginx server done"
 
