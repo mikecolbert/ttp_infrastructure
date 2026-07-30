@@ -23,5 +23,5 @@ git pull
 echo "Application code done"
 
 echo "Updating static files"
-cp -r /cluster-src/containers/core-app/ttp-docker/src/ttp-app/static/* /cluster-data/nginx/static/the-temperature-project
+cp -r /cluster-src/containers/core-app/ttp-docker/src/ttp_app/static/* /cluster-data/nginx/static/the-temperature-project
 echo "Static files done"
