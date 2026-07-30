@@ -472,11 +472,11 @@ or _bash_, if the image has it
 
 ## TODO:
 
-[] analytics
-[] monitoring
-[] other utils
-[] add second webstie
-[] how to persist data
+[ ] analytics  
+[ ] monitoring  
+[ ] other utils  
+[ ] add second webstie  
+[ ] how to persist data
 
 Example: "docker volume create NAME" if you need a persistent volume,
 our example doesn't use one.  
