@@ -15,4 +15,4 @@ REPO_PATH=$(realpath "$RELATIVE_PATH")
 
 ${REPO_PATH}/scripts/update-images.sh
 ${REPO_PATH}/scripts/update-source.sh
-${REPO_PATH}/scripts/build_containers.sh
+${REPO_PATH}/scripts/build-containers.sh
