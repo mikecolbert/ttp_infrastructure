@@ -270,7 +270,7 @@ sudo mkdir -p /cluster-data/nginx/certbot/www
 
 ### Launch NGINX with Docker Compose.
 
-`cd cluster-src/containers/web-servers/`
+`cd /cluster-src/containers/web-servers/`
 `docker compose up -d`
 
 Test that the empty NGINX container is handling requests.  
@@ -298,4 +298,9 @@ Reload NGINX's configuration files.
 `cd /cluster-src/containers/web-servers/`
 `docker compose exec -t nginx nginx -s reload`
 
-Michael Kennedy. amazon-talk-python-in-production (p. 167). (Function). Kindle Edition.
+## Deploying changes to the application
+
+After creating the custom scripts, you will need to make them executable.  
+`sudo chmod +x /cluster-src/scripts/*.sh`
+
+After this, you can use the `deploy` alias created in .zshrc to do the work.
