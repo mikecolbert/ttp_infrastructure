@@ -16,8 +16,8 @@ REPO_PATH=$(realpath "$RELATIVE_PATH")
 echo "Building base images"
 # cd ${REPO_PATH}/containers/base-images
 cd /cluster-src/containers/base-images
-docker compose build linux-example-base
-docker compose build python-example-base
+docker compose build linux-base
+docker compose build python-base
 echo "base images done"
 
 echo "Build core app"
