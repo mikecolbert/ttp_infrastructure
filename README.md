@@ -168,17 +168,9 @@ Verfiy:
 
 `docker network create -d bridge cluster-network --subnet=174.44.0.0/16`
 
-# TODO:
-
-Example: "docker volume create NAME" if you need a persistent volume,
-our example doesn't use one.  
-**_I may need to figure this out to hold the database._**.
-
-One more small thing: once you sudo mkdir -p /cluster-src /cluster-data, those folders are owned by root. If you then try to git clone or nano .env into them as azureuser (not through sudo), you'll hit "permission denied." Cleanest fix, right after creating them:
-
+Give the user ownership of /cluster-src and /cluster-data  
+Once you sudo mkdir -p /cluster-src /cluster-data, those folders are owned by root. If you then try to git clone or nano .env into them as azureuser (not through sudo), you'll hit "permission denied." Cleanest fix, right after creating them:  
 `sudo chown -R azureuser:azureuser /cluster-src /cluster-data`
-
-## That hands the folders to your everyday user so all the subsequent git/edit/copy steps in the book work without a sudo in front of every line — same end state as the book's root-owns-everything setup, just reached the Azure way.
 
 ## Clone repositories
 
@@ -457,18 +449,35 @@ Let's Encrypt certificates expire every 90 days, so renewal has to run unattende
 Create _/cluster-src/scripts/renew-certs.sh_
 
 Make it executable and schedule it.  
-`sudo mkdir -p /cluster-data/logs/certbot`
-`sudo chmod +x /cluster-src/scripts/renew-certs.sh`
+`sudo mkdir -p /cluster-data/logs/certbot`  
+`sudo chmod +x /cluster-src/scripts/renew-certs.sh`  
 `crontab -e`
 
-Add this line to crontab:  
+Choose nano. Add this line to crontab:  
 `0 3 * * * /cluster-src/scripts/renew-certs.sh >> /cluster-data/logs/certbot/renew.log 2>&1`
 
 ---
 
-# TODO:
+## Connect to a running Docker container
 
-analytics
-monitoring
-other utils
-add second webstie
+List running containers, get the name/ID:  
+`docker ps`
+
+Connect to the container:  
+`docker exec -it <container> sh`  
+or _bash_, if the image has it  
+-i keeps input open (interactive)  
+-t gives you a proper terminal — together they make it feel like an SSH session
+-sh is the safe default
+
+## TODO:
+
+[] analytics
+[] monitoring
+[] other utils
+[] add second webstie
+[] how to persist data
+
+Example: "docker volume create NAME" if you need a persistent volume,
+our example doesn't use one.  
+**_I may need to figure this out to hold the database._**.
