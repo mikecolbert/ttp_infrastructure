@@ -13,15 +13,15 @@ REPO_PATH=$(realpath "$RELATIVE_PATH")
 # ############### END Set up environment ##################################
 
 echo "Updating infrastructure code"
-cd ${REPO_PATH}/
+cd /cluster-src
 git pull
 echo "infrastructure code done"
 
 echo "Updating app code"
-cd ${REPO_PATH}/containers/core-app/ttp-docker/src/ttp-app
+cd /cluster-src/containers/core-app/ttp-docker/src/ttp_app
 git pull
 echo "Application code done"
 
 echo "Updating static files"
-cp -r ${REPO_PATH}/containers/core-app/ttp-docker/src/ttp-app/static/* /cluster-data/nginx/static/the-temperature-project
+cp -r /cluster-src/containers/core-app/ttp-docker/src/ttp-app/static/* /cluster-data/nginx/static/the-temperature-project
 echo "Static files done"
