@@ -465,10 +465,9 @@ List running containers, get the name/ID:
 
 Connect to the container:  
 `docker exec -it <container> sh`  
-or _bash_, if the image has it  
 -i keeps input open (interactive)  
--t gives you a proper terminal — together they make it feel like an SSH session
--sh is the safe default
+-t gives you a proper terminal — together they make it feel like an SSH session  
+-sh is the safe default you can use _-bash_ if the image has it
 
 ## TODO:
 
