@@ -304,3 +304,13 @@ After creating the custom scripts, you will need to make them executable.
 `sudo chmod +x /cluster-src/scripts/*.sh`
 
 After this, you can use the `deploy` alias created in .zshrc to do the work.
+
+---
+
+# TODO:
+
+lets encrypt
+analytics
+monitoring
+other utils
+add second webstie
