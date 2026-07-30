@@ -25,7 +25,7 @@ sudo reboot
 ### Enable automatic security updates
 
 Install unattended upgrades:  
-`sudo apt install unattended-updgrades -y`
+`sudo apt install unattended-upgrades -y`
 
 Enable unattended upgrades:  
 `sudo dpkg-reconfigure unattended-upgrades`
@@ -90,7 +90,11 @@ alias ls="pls"
 
 Reload the zsh config to pick up the new aliases: `source ~/.zshrc`
 
----
+### Add your user to the sudo group
+
+`sudo usermod -aG sudo azureuser`
+
+Log out and back in so the user picks up their new groups.
 
 ## Install Docker
 
@@ -146,22 +150,27 @@ and
 
 `sudo usermod -aG docker $USER`
 
-Log out and back in so the docker group picks up your username.
+Log out and back in so the user picks up their new groups.
 
 ### Test Docker
 
 `docker run hello-world`
 
-### Verify Docker starts automatically
+### Set Docker to start automatically
 
+Enable docker to start at boot:  
 `sudo systemctl enable docker`
 
+Verfiy:  
 `sudo systemctl status docker`
+
+---
 
 ### Create the persistent docker elements (network, disks, etc)
 
 `docker network create -d bridge cluster-network --subnet=174.44.0.0/16`
 
+TODO:
 Example: "docker volume create NAME" if you need a persistent volume,
 our example doesn't use one.  
 **_I may need to figure this out to hold the database._**.
@@ -170,4 +179,14 @@ One more small thing: once you sudo mkdir -p /cluster-src /cluster-data, those f
 
 `sudo chown -R azureuser:azureuser /cluster-src /cluster-data`
 
-That hands the folders to your everyday user so all the subsequent git/edit/copy steps in the book work without a sudo in front of every line — same end state as the book's root-owns-everything setup, just reached the Azure way.
+## That hands the folders to your everyday user so all the subsequent git/edit/copy steps in the book work without a sudo in front of every line — same end state as the book's root-owns-everything setup, just reached the Azure way.
+
+## Clone repositories
+
+Clone the infrastructure repository to /cluster-src/
+`sudo git clone https://github.com/mikecolbert/ttp_infrastructure.git /cluster-src/`
+
+Clone the application repository to the core-app's src folder
+`cd /cluster-src/containers/core-app/ttp-docker/src`
+
+`sudo git clone https://github.com/mikecolbert/ttp_app.git`

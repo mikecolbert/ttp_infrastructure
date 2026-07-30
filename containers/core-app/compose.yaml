@@ -1,0 +1,29 @@
+services:
+  the-temperature-project:
+    image: the-temperature-project
+    container_name: the-temperature-project
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:15000:15000"
+    volumes:
+      - "${APP_LOGS}:/logs"
+    build: ttp-docker
+    deploy:
+      resources:
+        limits:
+          # noinspection ComposeUnknownValues
+          memory: 1G
+    #    healthcheck:
+    #      test: nohup curl -A "Docker Health Agent (via curl)" --fail http://localhost:15000?app=docker-compose-healthcheck || exit 1
+    #      interval: 60s
+    #      retries: 5
+    #      start_period: 25s
+    #      timeout: 30s
+    networks:
+      cluster-network:
+        ipv4_address: 174.44.0.100
+
+networks:
+  cluster-network:
+    name: cluster-network
+    external: true
