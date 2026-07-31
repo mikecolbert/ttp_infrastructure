@@ -25,4 +25,4 @@ RUN apt -y install openssl
 # Install Oh My ZSH: Uses "robbyrussell" theme (original Oh My Zsh theme), with no plugins
 RUN apt install -y zsh
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
-    -t robbyrussell \
+    -t robbyrussell
