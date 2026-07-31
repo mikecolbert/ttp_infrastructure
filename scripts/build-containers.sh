@@ -13,6 +13,11 @@ cd /cluster-src/containers/core-app
 docker compose build
 echo "core app done"
 
+echo "Build sensor API"
+cd /cluster-src/containers/api
+docker compose build
+echo "sensor API done"
+
 echo "Building nginx server"
 cd /cluster-src/containers/web-servers
 docker compose build
@@ -21,6 +26,8 @@ echo "nginx server done"
 
 echo "Restart containers (if needed)"
 cd /cluster-src/containers/core-app
+docker compose up -d --remove-orphans
+cd /cluster-src/containers/api
 docker compose up -d --remove-orphans
 cd /cluster-src/containers/web-servers
 docker compose up -d nginx --remove-orphans

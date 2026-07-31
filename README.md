@@ -182,9 +182,23 @@ Clone the application repository to the core-app's src folder
 
 `sudo git clone https://github.com/mikecolbert/ttp_app.git`
 
+Clone the sensor API repository to the api container's src folder
+`cd /cluster-src/containers/api/ttp-docker/src`
+
+`sudo git clone https://github.com/mikecolbert/ttp_sensor_api.git`
+
 ## Edit core-app files
 
 Edit .dockerignore, Dockerfile, .env, and compose.yaml as needed.
+
+## Edit api files
+
+Edit .dockerignore, Dockerfile, .env, and compose.yaml as needed.
+
+Set a real API_KEY in `containers/api/.env` (generate one with
+`openssl rand -hex 32`) - this is the secret the ESP32 sends in the
+X-API-Key header. It is never committed; the checked-in `.env` is just
+the template with an empty value.
 
 ## Test your application
 
@@ -237,6 +251,45 @@ Use httpie to call the app, should get 200 OK.
 
 You can also docker commands to test that the container is running.  
 `docker ps`
+
+## Sensor API container
+
+Holds ESP32 sensor readings in SQLite, on a bind-mounted host directory so
+the data survives container rebuilds. See `ttp_sensor_api`'s README for the
+API contract.
+
+### Create the data and log directories
+
+```
+sudo mkdir -p /cluster-data/ttp-sensor-api/data
+sudo mkdir -p /cluster-data/ttp-sensor-api/logs
+sudo chown -R azureuser:azureuser /cluster-data/ttp-sensor-api
+```
+
+### Build your api container
+
+This container relies on linux-base -> python-base -> api
+
+`cd /cluster-src/containers/api/`
+
+`docker compose build`
+
+### Start your api container
+
+`docker compose up -d`
+
+### Connect to your api
+
+`http -h localhost:15001/api/v1/health`
+
+You should see a _200 OK_ with `{"status": "ok"}`.
+
+### Set your api container to launch on Linux startup
+
+Same pattern as core-app - run from the folder with the compose.yaml.  
+`cd /cluster-src/containers/api/`
+
+`sudo bash /cluster-src/scripts/create-docker-compose-service.sh`
 
 ## Configuring NGINX
 
@@ -475,8 +528,9 @@ Connect to the container:
 [ ] monitoring  
 [ ] other utils  
 [ ] add second webstie  
-[ ] how to persist data
+[x] how to persist data
 
-Example: "docker volume create NAME" if you need a persistent volume,
-our example doesn't use one.  
-**_I may need to figure this out to hold the database._**.
+Sensor readings live in SQLite on a bind mount at
+`/cluster-data/ttp-sensor-api/data`, owned by the `ttp-sensor-api`
+container alone (nothing else touches the file, so no multi-writer
+locking concerns). See the "Sensor API container" section above.

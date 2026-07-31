@@ -1,0 +1,33 @@
+services:
+  ttp-sensor-api:
+    image: ttp-sensor-api
+    container_name: ttp-sensor-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:15001:15001"
+    environment:
+      - API_KEY=${API_KEY}
+      - DB_PATH=/data/sensors.db
+    volumes:
+      - "${APP_DATA}:/data"
+      - "${APP_LOGS}:/logs"
+    build: ttp-docker
+    healthcheck:
+      test: curl -f http://localhost:15001/api/v1/health || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
+    deploy:
+      resources:
+        limits:
+          # noinspection ComposeUnknownValues
+          memory: 512M
+    networks:
+      cluster-network:
+        ipv4_address: 174.44.0.101
+
+networks:
+  cluster-network:
+    name: cluster-network
+    external: true
