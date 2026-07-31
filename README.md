@@ -174,18 +174,27 @@ Once you sudo mkdir -p /cluster-src /cluster-data, those folders are owned by ro
 
 ## Clone repositories
 
+/cluster-src is already owned by azureuser from the chown step above, so
+none of these need sudo - using sudo here would re-root-own the files and
+break `git pull` later (see update-source.sh), which is exactly what
+happened the first time this doc had `sudo git clone` on these lines.
+
 Clone the infrastructure repository to /cluster-src/
-`sudo git clone https://github.com/mikecolbert/ttp_infrastructure.git /cluster-src/`
+`git clone https://github.com/mikecolbert/ttp_infrastructure.git /cluster-src/`
 
 Clone the application repository to the core-app's src folder
 `cd /cluster-src/containers/core-app/ttp-docker/src`
 
-`sudo git clone https://github.com/mikecolbert/ttp_app.git`
+`git clone https://github.com/mikecolbert/ttp_app.git`
 
 Clone the sensor API repository to the api container's src folder
 `cd /cluster-src/containers/api/ttp-docker/src`
 
-`sudo git clone https://github.com/mikecolbert/ttp_sensor_api.git`
+`git clone https://github.com/mikecolbert/ttp_sensor_api.git`
+
+If a repo here is already root-owned from a previous sudo clone, fix it
+with `sudo chown -R azureuser:azureuser <path-to-repo>` rather than
+re-cloning.
 
 ## Edit core-app files
 
