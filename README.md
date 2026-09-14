@@ -4,6 +4,12 @@ Docker infrastructure for [thetemperatureproject.com](https://thetemperatureproj
 
 ---
 
+## Updating the Linux server, web server, and application code
+
+`ssh -i <private_key> username@ip`
+
+`deploy`
+
 ## Build and Customize Your Linux Server
 
 For now, I am using a linux virtual machine from Azure  
