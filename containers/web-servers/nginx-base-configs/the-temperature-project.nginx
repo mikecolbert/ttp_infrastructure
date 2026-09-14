@@ -1,5 +1,5 @@
 server {
-    server_name thetemperatureproject.org;
+    server_name thetemperatureproject.com;
     charset utf-8;
     client_max_body_size 1M;
     server_tokens off;
@@ -7,8 +7,8 @@ server {
     # Listen on the HTTPS port and point at the cert files certbot just created
     listen 443 ssl;
     http2 on;
-    ssl_certificate /etc/letsencrypt/live/thetemperatureproject.org/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/thetemperatureproject.org/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/thetemperatureproject.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/thetemperatureproject.com/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
@@ -81,11 +81,11 @@ server {
 
 # Anything that still arrives on plain HTTP gets bounced to HTTPS
 server {
-    if ($host = thetemperatureproject.org) {
+    if ($host = thetemperatureproject.com) {
         return 301 https://$host$request_uri;
     }
 
     listen 80;
-    server_name thetemperatureproject.org;
+    server_name thetemperatureproject.com;
     return 404;
 }

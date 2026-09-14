@@ -1,6 +1,6 @@
 # ttp_infrastructure
 
-Docker infrastructure for [thetemperatureproject.org](https://thetemperatureproject.org)
+Docker infrastructure for [thetemperatureproject.com](https://thetemperatureproject.com)
 
 ---
 
@@ -364,7 +364,7 @@ After this, you can use the `deploy` alias created in .zshrc to do the work.
 
 ### Confirm DNS points to your server
 
-`dig +short thetemperatureproject.org`  
+`dig +short thetemperatureproject.com`  
 Does the IP returned match the IP address of your server?
 
 ### Request the certificate
@@ -373,14 +373,14 @@ Move into the folder with the nginx + certbot compose.yaml.
 `cd /cluster-src/containers/web-servers/`
 
 Ask certbot for a certificate, proving ownership via the shared webroot folder.  
-`docker compose run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ -d thetemperatureproject.org`
+`docker compose run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ -d thetemperatureproject.com`
 
 Update NGINX configuration to use the certificate.  
 `cd /cluster-src/containers/web-servers/nginx-base-configs/the-temperature-project.nginx`
 
 ```
 server {
-    server_name thetemperatureproject.org;
+    server_name thetemperatureproject.com;
     charset utf-8;
     client_max_body_size 1M;
     server_tokens off;
@@ -388,8 +388,8 @@ server {
     # Listen on the HTTPS port and point at the cert files certbot just created
     listen 443 ssl;
     http2 on;
-    ssl_certificate /etc/letsencrypt/live/thetemperatureproject.org/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/thetemperatureproject.org/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/thetemperatureproject.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/thetemperatureproject.com/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
@@ -451,12 +451,12 @@ server {
 
 # Anything that still arrives on plain HTTP gets bounced to HTTPS
 server {
-    if ($host = thetemperatureproject.org) {
+    if ($host = thetemperatureproject.com) {
         return 301 https://$host$request_uri;
     }
 
     listen 80;
-    server_name thetemperatureproject.org;
+    server_name thetemperatureproject.com;
     return 404;
 }
 ```
@@ -467,7 +467,7 @@ server {
 `docker compose exec -t nginx nginx -s reload`
 
 Confirm it worked  
-`curl -I https://thetemperatureproject.org`
+`curl -I https://thetemperatureproject.com`
 
 I had errors and had to add do the following:
 
@@ -500,7 +500,7 @@ Then reload and test again.
 `docker compose exec -t nginx nginx -s reload`
 
 Confirm it worked  
-`curl -I https://thetemperatureproject.org`
+`curl -I https://thetemperatureproject.com`
 
 It worked.
 
